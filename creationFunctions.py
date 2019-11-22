@@ -73,6 +73,23 @@ def createBackEndExpress():
     criaArquivos()
     editaPackage()
     criaNodemon()
+    criaDiretorios("config", "src")
+    criaArquivo("database.js", "src/config",
+                "module.exports = {\n    dialect: 'dbnamedialect',\n	  host: 'localhost',\n	  port: '5433',\n	  username: 'username',\n	  password: 'pass',\n	  database: 'dbname',\n	  define: {\n		  timestamps: true,\n		  underscored: true,\n		  underscoredAll: true,\n	  },\n	};\n")
+    criaDiretorios("database", "src")
+    criaDiretorios("migrations", "src/database")
+    criaDiretorios("seeds", "src/database")
+    criaDiretorios("app", "src")
+    criaDiretorios("controllers", "src/app")
+    criaDiretorios("models", "src/app")
+    addDependencies()
+    criaArquivo(".sequelizerc", None, "const { resolve } = require(\"path\");\n\n	module.exports = {\n		config: resolve(__dirname, 'src', 'config', 'database.js'),\n		'models-path': resolve(__dirname, 'src', 'app', 'models'),\n  'migrations-path': resolve(__dirname, 'src', 'database', 'migrations'),\n  'seeders-path': resolve(__dirname, 'src', 'database', 'seeds'),\n};\n")
+
+
+def addDependencies():
+    os.system("yarn add sequelize")
+    os.system("yarn add pg pg-hstore")
+    os.system("yarn add sequelize-cli -D")
 
 
 def inicializaYarn():
@@ -89,12 +106,41 @@ def criaDiretorio():
     os.mkdir(pathFull)
 
 
+def criaDiretorios(diretorio, dentro):
+    if dentro is not None:
+        path = os.path.abspath("./{}".format(dentro))
+        directory = diretorio
+        pathFull = os.path.join(path, directory)
+        print(pathFull)
+        os.mkdir(pathFull)
+    else:
+        path = os.path.abspath("./")
+        directory = diretorio
+        pathFull = os.path.join(path, directory)
+        print(pathFull)
+        os.mkdir(pathFull)
+
+
 def criaArquivos():
     path = os.path.abspath("./")
     pathSrc = os.path.join(path, "src")
     criaApp(pathSrc)
     criaServer(pathSrc)
     criaRoutes(pathSrc)
+
+
+def criaArquivo(nome, dentro, text):
+    if dentro is not None:
+        path = os.path.abspath("./")
+        pathSrc = os.path.join(path, dentro)
+        f = open("{}/{}".format(pathSrc, nome), "w+")
+        f.write(text)
+        f.close()
+    else:
+        path = os.path.abspath("./")
+        f = open("{}/{}".format(path, nome), "w+")
+        f.write(text)
+        f.close()
 
 
 def criaApp(pathLocal):
